@@ -33,12 +33,10 @@ def zoomIn(board):
     
     board.grid = [ [0]*rowCnt for n in range(colCnt) ]
 
-    for row in temp:
-        for col in row:
-            if col == 1:
-                board.grid[boardRow][boardCol] = 1
-                boardCol = boardCol + 1
-        boardRow = boardRow + 1
+    for i in range(rowCnt):
+        for j in range(rowCnt):
+            if temp[i][j] == 1:
+                board.grid[i][j] = 1
 
     board.canv.delete("all")
     board.drawBoard()
@@ -67,10 +65,22 @@ def zoomOut(board):
 
     board.grid = [ [0]*rowCnt for n in range(colCnt) ]
 
-    for row in temp:
-        for col in row:
-            if col == 1:
-                board.grid[temp.index(row)][row.index(col)] = 1
+    for i in range(len(temp)):
+        for j in range(len(temp[i])):
+            if temp[i][j] == 1:
+                board.grid[i][j] = 1
 
     board.canv.delete("all")
     board.drawBoard()
+
+    def evolve(aCelPos):
+        # Check if 
+        if not bool(acelPos): 
+            return
+        
+        for pos in aCelPos:
+            celY = pos[0]
+            celX = pos[1]
+
+            cell = aCelPos[pos]
+

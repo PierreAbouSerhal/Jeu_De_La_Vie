@@ -21,7 +21,7 @@ class Board:
         self.height = self.cellD * self.row
         self.grid   = [ [0]*self.col for n in range(self.row) ]
         self.canv   = Canvas(frame, width=self.width, height=self.height, bg=self.BG)
-        self.aCelPos= {}
+        self.aCelPos= {} # Dictionnary that contains all alive cell positions in board grid
         
     def setCol(self, col):
         self.col = col
@@ -60,8 +60,8 @@ class Board:
                     cell.isAlive = True
                     cell.clickCnt = 1
 
-                self.gridCells[(int(x1/cellD), int(y1/cellD))] = gridCell # Storing all grid cells to access them
-                self.cells[(int(x1/cellD), int(y1/cellD))]     = cell     # Storing all game cells to access them
+                self.gridCells[(int(y1/cellD), int(x1/cellD))] = gridCell # Storing all grid cells to access them
+                self.cells[(int(y1/cellD), int(x1/cellD))]     = cell     # Storing all game cells to access them
             
                 x1 = x1 + cellD
                 x2 = x2 + cellD
@@ -80,9 +80,17 @@ class Board:
         y = int(event.y/self.cellD)
         
         # Switching cell collor
-        self.canv.itemconfig(self.gridCells[(x, y)], fill = self.BGALIVE if self.cells[(x,y)].clickCnt % 2 == 0 else self.BGDEAD)
+        self.canv.itemconfig(self.gridCells[(y, x)], fill = self.BGALIVE if self.cells[(y,x)].clickCnt % 2 == 0 else self.BGDEAD)
 
-        self.cells[(x,y)].clickCnt = self.cells[(x,y)].clickCnt + 1
+        self.cells[(y,x)].clickCnt = self.cells[(y,x)].clickCnt + 1
 
-        self.cells[(x,y)].isAlive  = not self.cells[(x,y)].isAlive
-        self.grid[x][y] = 1 if self.cells[(x,y)].isAlive else 0
+        self.cells[(y,x)].isAlive  = not self.cells[(y,x)].isAlive
+        self.grid[y][x] = 1 if self.cells[(y,x)].isAlive else 0
+
+        # Saving alive cell position
+        if self.grid[y][x] = 1:
+            self.aCelPos[(y,x)] = self.cells[(y,x)]
+        else:
+            self.aCelPos.pop((y,x)), None)
+        
+        

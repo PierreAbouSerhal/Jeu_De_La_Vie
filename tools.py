@@ -82,5 +82,11 @@ def zoomOut(board):
             celY = pos[0]
             celX = pos[1]
 
+            y = 0 if celY = 0 else celY - 1
+            x = 0 if celX = 0 else celX - 1
+
             cell = aCelPos[pos]
 
+            while celY < celY + 2:
+
+                

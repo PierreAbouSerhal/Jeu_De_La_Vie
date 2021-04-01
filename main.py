@@ -29,7 +29,7 @@ btnZoomIn.grid(sticky="n", pady=(10,0))
 btnZoomOut = Button(fOption, text="Zoom out!", width=BTNWIDTH, command = lambda: tools.zoomOut(b))
 btnZoomOut.grid(sticky="n", pady=(10,0))
     
-btnEvolve = Button(fOption, text="Evolve", width=BTNWIDTH)
+btnEvolve = Button(fOption, text="Evolve", width=BTNWIDTH, command = lambda: tools.evolve(b))
 btnEvolve.grid(sticky="n", pady=(10,0))
 
 fOption.grid_columnconfigure(0, weight=1)

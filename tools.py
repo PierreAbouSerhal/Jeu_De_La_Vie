@@ -2,45 +2,58 @@ from tkinter import *
 from tkinter.ttk import *
 import tkinter as tk
 from cell import Cell
+from time import sleep
 
-FIXED_HEIGHT = 700
-DIVISORS     = [1, 2, 4, 5, 7, 10, 14, 20, 25, 28, 35, 50, 70, 100, 140, 175, 350, 700]
-DIVIDX       = 1
+# The game grid is a square of dimension = 700px 
+FIXED_DIMENSION = 700 
+
+# All divisors of 700: To properly fill all of the canvas with cells 
+DIVISORS        = [1, 2, 4, 5, 7, 10, 14, 20, 25, 28, 35, 50, 70, 100, 140, 175, 350, 700]
+
+# Variable used to calculate number of cells in the board
+divIdx          = 1
+
+# Number of generations
+genCnt = 0
 
 def zoomIn(board):
     ''' Zoom in the grid (in reality we are reducing the number of grid cells) 
         Takes the game board as parameter'''
-    global DIVIDX
-    
-    boardRow = 0
-    boardCol  = 0
+    global divIdx
+    board.zoom = True # if zoom, board will save cell states without evolving 
 
-    if DIVIDX == 0:
+    if divIdx == 0: # Prevent index exception
         return
 
+    # Calculate current board dimension
     for divisor in DIVISORS:
-        if FIXED_HEIGHT / board.cellD == divisor:
-            DIVIDX = DIVISORS.index(divisor)
+        if FIXED_DIMENSION / board.cellD == divisor:
+            divIdx = DIVISORS.index(divisor)
 
-    DIVIDX = DIVIDX - 1 
+    # New board dimension 
+    divIdx = divIdx - 1 
 
-    board.setCellD(FIXED_HEIGHT / DIVISORS[DIVIDX])
+    # Update cell dimension
+    board.setCellD(FIXED_DIMENSION / DIVISORS[divIdx])
 
-    colCnt = int(FIXED_HEIGHT / board.cellD)
+    colCnt = int(FIXED_DIMENSION / board.cellD)
     rowCnt = colCnt
 
     board.setCol(colCnt)
     board.setRow(rowCnt)
 
+    # temp is used preserve cell state
     temp = board.cells
     
     board.cells = {}
 
+    # Reinitiate board cells
     for i in range(rowCnt):
         for j in range(colCnt):
             cell = Cell()
             board.cells[i,j] = cell
 
+    # Resurecting cells
     for i in range(rowCnt):
         for j in range(rowCnt):
             if temp[i,j].isAlive:
@@ -49,24 +62,31 @@ def zoomIn(board):
     board.canv.delete("all")
     board.drawBoard()
 
+    board.zoom = False
+
 def zoomOut(board):
     ''' Zoom out of the grid (in reality we are increasing the number of grid cells) 
         Takes the game board as parameter '''
-    global DIVIDX
-    
-    if DIVIDX == len(DIVISORS) - 1:
+    global divIdx
+
+    board.zoom = True # if zoom, board will save cell states without evolving 
+
+    if divIdx == len(DIVISORS) - 1: # Prevent index exception
         return
 
+    # Calculate current board dimension
     for divisor in DIVISORS:
-        if FIXED_HEIGHT / board.cellD == divisor:
-            DIVIDX = DIVISORS.index(divisor)
+        if FIXED_DIMENSION / board.cellD == divisor:
+            divIdx = DIVISORS.index(divisor)
 
-    DIVIDX = DIVIDX + 1 
+    # New board dimension 
+    divIdx = divIdx + 1 
 
-    board.setCellD(FIXED_HEIGHT / DIVISORS[DIVIDX])
+    # Updating cell dimension 
+    board.setCellD(FIXED_DIMENSION / DIVISORS[divIdx])
 
-    colCnt = int(FIXED_HEIGHT / board.cellD)
-    rowCnt = int(FIXED_HEIGHT / board.cellD)
+    colCnt = int(FIXED_DIMENSION / board.cellD)
+    rowCnt = int(FIXED_DIMENSION / board.cellD)
 
     oldRowCnt = board.row
     oldColCnt = board.col
@@ -74,15 +94,18 @@ def zoomOut(board):
     board.setCol(colCnt)
     board.setRow(rowCnt)
 
+    # temp is used preserve cell state
     temp = board.cells
 
     board.cells = {}
 
+    # Reinitiate board cells
     for i in range(rowCnt):
         for j in range(colCnt):
             cell = Cell()
             board.cells[i,j] = cell
 
+    # Resurecting alive cells
     for i in range(oldRowCnt):
         for j in range(oldColCnt):
             if temp[i,j].isAlive:
@@ -91,8 +114,12 @@ def zoomOut(board):
     board.canv.delete("all")
     board.drawBoard()
 
-def evolve(board):
+    board.zoom = False
+
+def evolve(board, lblGen):
     ''' Evaluate which cell lives or dies each generation'''
+    global genCnt
+
     cells  = board.cells
     rowCnt = board.row - 1 # We substracted 1 because grid will begin at index 0
     colCnt = board.col - 1 # We substracted 1 because grid will begin at index 0
@@ -229,4 +256,20 @@ def evolve(board):
                 cells[y,x].nbrs = nbrs
 
     board.drawBoard()
-    #board.canv.after(1000, evolve())
+    
+    # Updating generation label
+    genCnt += 1
+    lblGen.config(text="Genration: " + str(genCnt))
+
+    if board.anim: 
+        board.parent.after(200, evolve, board, lblGen)
+    
+
+def anim(board, lblGen):
+    ''' Begin the animation '''
+    board.anim = True
+    evolve(board, lblGen)
+
+def stop(board):
+    ''' Stop the animation '''
+    board.anim = False

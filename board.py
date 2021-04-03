@@ -23,6 +23,7 @@ class Board:
         self.parent = frame # Parent of the canvas that will contain the grid 
         self.zoom   = False # Boolean that is used to zoom in or out of the boeard witout destroying all cells
         self.anim   = False # Boolean that is used to stop or begin the animation
+        self.drawPattern = False # Boolean that is used to draw known cellular pattern 
         self.cells  = {}    # Dictionnary that contains all cells and their positions
 
         # creating all initial cells
@@ -43,54 +44,81 @@ class Board:
     def setCellD(self, cellD):
         self.cellD = cellD
 
+    def refresh(self):
+        ''' Refresh the board '''
+
+        for cellXY in self.cells:
+            y = cellXY[0]
+            x = cellXY[1]
+            cell = self.cells[cellXY]
+
+            if not self.drawPattern:
+                # Resurect or kill cell
+                if cell.nbrs == 3:
+                    cell.live()
+                elif cell.nbrs == 2:
+                    if not cell.isAlive:
+                        cell.die()
+                    else:
+                        cell.live()
+                elif cell.nbrs < 2 or cell.nbrs > 3:
+                    cell.die()
+
+            self.canv.itemconfig(self.gridCells[(y, x)], fill = self.BGALIVE if cell.isAlive else self.BGDEAD)
+
+            cell.clickCnt = 1 if cell.isAlive else 0
+
     def drawBoard(self):
-        ''' Draws th board and returns the canvas '''
 
         self.gridCells  = {} # Dictionnary that contains all grid cells
 
         cellD  = self.cellD
-        width  = self.width
-        height = self.height
         canvas = self.canv
+        cells  = self.cells
+        zoom   = self.zoom
+        gridD  = self.col - 1
 
         x1, y1 = 0, 0
         x2, y2 = cellD, cellD
 
-        for y in range(self.row):
-
-            for x in range(self.col):
-                
-                # Preserve all cell states when zooming: zoom = True
-                if not self.zoom: 
-                    
-                    # Resurect or kill cell
-                    if self.cells[y,x].nbrs == 3:
-                        self.cells[y,x].live()
-                    elif self.cells[y,x].nbrs == 2:
-                        if not self.cells[y,x].isAlive:
-                            self.cells[y,x].die()
-                        else:
-                            self.cells[y,x].live()
-                    elif self.cells[y,x].nbrs < 2 or self.cells[y,x].nbrs > 3:
-                        self.cells[y,x].die()
-
-                # Creationg the canvas
-                gridCell = canvas.create_rectangle(x1, y1, x2, y2, fill= self.BGALIVE if self.cells[y,x].isAlive else self.BGDEAD, outline="black")
-
-                self.cells[y,x].clickCnt = 1 if self.cells[y,x].isAlive else 0 # Keep the click funtionnality working
-
-                canvas.tag_bind(gridCell, '<Button-1>', self.onCellClick) # On click listener for each gridCell in the board 
-
-                self.gridCells[(int(y1/cellD), int(x1/cellD))] = gridCell # Storing all grid cells to access them and change color
+        # Drawing board rectangles
+        for cellXY in cells:
+            y = cellXY[0]
+            x = cellXY[1]
+            cell = cells[cellXY]
             
-                x1 = x1 + cellD
-                x2 = x2 + cellD
+            # Preserve all cell states when zooming: zoom = True
+            if not zoom: 
+                # Resurect or kill cell
+                if cell.nbrs == 3:
+                    cell.live()
+                elif cell.nbrs == 2:
+                    if not cell.isAlive:
+                        cell.die()
+                    else:
+                        cell.live()
+                elif cell.nbrs < 2 or cell.nbrs > 3:
+                    cell.die()
 
-            x1 = 0
-            x2 = cellD
-            y1 = y1 + cellD
-            y2 = y2 + cellD
-        
+            # Creationg the canvas
+            gridCell = canvas.create_rectangle(x1, y1, x2, y2, fill= self.BGALIVE if self.cells[y,x].isAlive else self.BGDEAD, outline="black")
+
+            self.cells[y,x].clickCnt = 1 if self.cells[y,x].isAlive else 0 # Keep the click funtionnality working
+
+            canvas.tag_bind(gridCell, '<Button-1>', self.onCellClick) # On click listener for each gridCell in the board 
+
+            self.gridCells[(int(y1/cellD), int(x1/cellD))] = gridCell # Storing all grid cells to access them and change color
+
+            # Updating rectangles coordinates
+            x1 = x1 + cellD
+            x2 = x2 + cellD
+
+            if x == gridD:
+                x1 = 0
+                x2 = cellD
+                y1 = y1 + cellD
+                y2 = y2 + cellD
+
         canvas.pack(side=tk.TOP, anchor=tk.NW)
         return canvas
 

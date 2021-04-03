@@ -33,6 +33,10 @@ btnZoomIn.grid(sticky = "n", pady = (10,0))
 btnZoomOut = Button(fOption, text = "Zoom out!", width = BTNWIDTH, command = lambda: tools.zoomOut(b))
 btnZoomOut.grid(sticky =" n", pady = (10,0))
 
+# Button Gosper Glider Gun: generates Gosper glider initial cell positions
+btnGGG = Button(fOption, text = "Gosper Glide Gun!", width = BTNWIDTH, command = lambda: tools.ggg(b))
+btnGGG.grid(sticky =" n", pady = (10,0))
+
 # Label to display generations
 lblGen = Label(fOption, text = "Generation: 0", fg = "white", bg = Board.BG)
 
@@ -47,6 +51,10 @@ btnAnim.grid(sticky = "n", pady = (10,0))
 # Button Stop: to stop the animation
 btnStop = Button(fOption, text = "Stop!", width = BTNWIDTH, command = lambda: tools.stop(b))
 btnStop.grid(sticky = "n", pady = (10,0))
+
+# Button Reset: reinitiate all cells and generation
+btnReset = Button(fOption, text = "Reset!", width = BTNWIDTH, command = lambda: tools.reset(b, lblGen))
+btnReset.grid(sticky = "n", pady = (10,0))
 
 lblGen.grid(sticky = "n", pady = (10,0))
 

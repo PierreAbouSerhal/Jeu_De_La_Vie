@@ -127,7 +127,7 @@ def evolve(board, lblGen):
     for cellXY in cells:
         y = cellXY[0]
         x = cellXY[1]
-        cell = cells[cellXY]
+        #cell = cells[cellXY]
 
         # 1- Top left border
         if y == 0 and x == 0:

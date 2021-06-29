@@ -1,0 +1,100 @@
+Jeu_De_La_Vie by Pierre Abou Serhal
+
+Introduction
+------------
+This Project Simulates The Game Of Life Using Python.
+The Game of Life, also known simply as Life, is a cellular automaton. It is a zero-player game, meaning that its evolution is determined by its initial state, 
+requiring no further input from the player.
+The game is played in a two dimensional grid in which cells can be "dead" or "alive". These are the "states" of a single cell.
+The state of a particular cell is determined based on the state of its neighbours.
+
+Game functionalites
+-------------------
+1- Zoom in: The player can zoom in to the board -> number of cells in the board will decrease
+2- Zoom out: The player can zoom out of the board -> number of cells in the board will increase
+3- Gosper Glider Gun: This will initialise the "Gosper Glider Gun" automaton on the board for the player. The board will adjust its dimensions automatically if it does't fit on it.
+4- Evolve: ONLY ONE generation will pass. No animation.
+5- Animate: The player can see how the initial cells will evolve and change state over time.
+6- Stop: The player can stop the animation at any time.
+7- Reset: The player can reset the board to its initial state.
+8- Generations: The player can keep track of the number of generations that have passed. 
+
+Graphical interface AND Game Structure
+----------------------------------------
+Object aspect:
+
+I Used tkinter library to create the GUI for the game. 
+First, i created a 'Board' class that represent the game 'grid' in which the user can iteract.
+
+- Board class Structure:
+    *!* Properties: 11 properties -> 1.  cellD:       Dimension of a single cell inside the board 
+                                     2.  col:         Number of columns in the board
+                                     3.  row:         Number of rows in the board
+                                     4.  width:       Total width of the board
+                                     5.  height:      Total height of the board
+                                     6.  parent:      Parent of the canvas that will contain the board 
+                                     7.  zoom:        Boolean that is used to zoom in or out of the boeard witout destroying all cells
+                                     8.  anim:        Boolean that is used to stop or begin the animation
+                                     9.  drawPattern: Boolean that is used to draw known cellular pattern (like the Gosper Glider Gun)
+                                     10. cells:       Dictionnary that contains all cells and their positions in the board
+                                     11. canv:        Canvas that will contain the game board
+
+    *!* Functions: 6 functions ->    1.  setCol       Setter for the col property
+                                     2.  setRow       Setter for the row property
+                                     3.  setCellD     Setter for the cellD property. (D stands for dimention)
+                                     4.  refresh:     Refresh the board after each iteration
+                                     5.  drawBoard:   Intiate the canvas and draws the board
+                                     6.  onCellClick: Click listener for cells in board 
+
+The board contains cells, so i have created a 'Cell' class that represents each cell in the board
+
+- Cell class Structure:
+    *!* Properties: 3 properties ->  1.  isAlive:     Boolean thar is used to know if a cell is alive or dead
+                                     2.  clickCnt:    Total click count on a single cell. Is used to change the cell color
+                                     3.  nbrs:        Total number of alive neighbours
+
+    *!* Functions: 2 functions ->    1.  die:         Kills a cell object
+                                     2.  live:        Resurect a cell object from the dead
+
+I have decided to put functionalites and game logic inside one file called tools
+
+- Tools 
+    *!* Global variables: 4 ->       1.  FIXED_DIMENSION: The game grid is a square of dimension = 700px
+                                     2.  DIVISORS:    All divisors of 700: To properly fill all of the canvas with cells 
+                                     3.  divIdx:      Variable used to calculate number of cells in the board
+                                     4.  genCnt:      Number of generations
+
+    *!* Functions: 7 functions ->    1. zoomIn:       Zoom in the grid (in reality we are reducing the number of board cells
+                                     2. zoomOut       Zoom out of the grid (in reality we are increasing the number of board cells) 
+                                     3. evolve        Evaluate which cell lives or dies each generation (This core function of the game)
+                                     4. anim          Begin the animation 
+                                     5. stop          Stop the animation
+                                     6. reset         Resets the board to its initial state and resets the generation count
+                                     7. ggg           Initiate the Gosper Glider Gun
+
+I am constructing the GUI insite the main file. Nothing special 
+
+fonctional aspect:
+
+I have used lambda expressions inside the main file to set the button listeners. 
+
+Explanation of the algorith used to evolve the cells:
+-----------------------------------------------------
+I am storing cell coordinates in a one dimensional array to avoid nested loops and to reduce complexity.
+once X and Y coordinates retreived there is 8 special cases that needs to be checked:
+    1. Top left border
+    2. Top right corner
+    3. Bottom left corner
+    4. Bottom right corner
+    5. Top border
+    6. Right border
+    7. Bottom border
+    8. Left border
+
+otherwise cell is not on the board border
+
+In each case we increment the number of alive neighbours of each cell
+
+Once number of alive neighbours calculate we just refresh the board
+
+In the refresh function we apply the rules of the game that kills or resurect each cell 
